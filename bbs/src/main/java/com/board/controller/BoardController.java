@@ -12,14 +12,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import com.board.domain.BoardVO;
 import com.board.domain.Page;
+import com.board.domain.ReplyVO;
 import com.board.service.BoardService;
+import com.board.service.ReplyService;
 
 @Controller
 @RequestMapping("/board/")
 public class BoardController {
 	
 	@Inject
-	BoardService service;
+	private BoardService service;
+	
+	@Inject
+	private ReplyService replyService;
 	
 	@RequestMapping(value="list", method=RequestMethod.GET)
 	public void getList(Model model) throws Exception {
@@ -47,6 +52,11 @@ public class BoardController {
 	@RequestMapping(value="view", method=RequestMethod.GET)
 	public void getView(@RequestParam("bno") int bno, Model model) throws Exception {
 		model.addAttribute("view", service.view(bno));
+		
+		// 댓글 조회
+		List<ReplyVO> reply = null;
+		reply = replyService.list(bno);
+		model.addAttribute("reply", reply);
 	}
 	
 	// 게시물 수정
@@ -121,6 +131,36 @@ public class BoardController {
 		 
 		// 현재 페이지
 		 model.addAttribute("select", num);
+	}
+	
+	// 게시물 목록 + 페이징 추가 + 검색
+	@RequestMapping(value = "listPageSearch", method = RequestMethod.GET)
+	public void getListPageSearch(Model model, @RequestParam("num") int num, 
+			@RequestParam(value="searchType", required=false, defaultValue="title") String searchType, 
+			@RequestParam(value="keyword", required=false, defaultValue="") String keyword) throws Exception {
+		Page page = new Page();
+
+		//int cnt = service.count();
+		//page.setCount(cnt);
+		page.setNum(num);		
+		page.setCount(service.searchCount(searchType, keyword));
+		
+		// 검색 타입과 검색어
+		page.setSearchType(searchType);
+		page.setKeyword(keyword);
+
+		List<BoardVO> list = null;
+		//list = service.listPage(page.getDisplayPost(), page.getPostNum());
+		list = service.listPageSearch(page.getDisplayPost(), page.getPostNum(), searchType, keyword);
+
+		model.addAttribute("list", list);
+		
+		model.addAttribute("page", page);
+
+		// 현재 페이지
+		model.addAttribute("select", num);
+		//model.addAttribute("searchType", searchType);
+		//model.addAttribute("keyword", keyword);
 	}
 	
 }

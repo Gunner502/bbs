@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,17 +12,65 @@
 	<div id="nav">
 		<%@ include file="../include/nav.jsp"%>
 	</div>
-	<form method="post">
+	
+	<label>제목</label>${view.title}<br /> <label>작성자</label>
+	${view.writer}<br /> <label>내용</label> ${view.content}<br />
 
-		<label>제목</label>${view.title}<br /> <label>작성자</label>
-		${view.writer}<br /> <label>내용</label> ${view.content}<br />
+	<div>
+		<a href="/board/modify?bno=${view.bno}">게시물 수정</a>, <a href="/board/delete?bno=${view.bno}">게시물 삭제</a>
+	</div>
+	
+	<!-- 댓글시작 -->
+	<hr />
 
-		<div>
-			<a href="/board/modify?bno=${view.bno}">게시물 수정</a>, <a href="/board/delete?bno=${view.bno}">게시물 삭제</a>
-		</div>
+	<ul>
+		<!-- <li>
+			<div>
+				<p>첫번째 댓글 작성자</p>
+				<p>첫번째 댓글</p>
+			</div>
+		</li>
+		<li>
+			<div>
+				<p>두번째 댓글 작성자</p>
+				<p>두번째 댓글</p>
+			</div>
+		</li>
+		<li>
+			<div>
+				<p>세번째 댓글 작성자</p>
+				<p>세번째 댓글</p>
+			</div>
+		</li> -->
 
-		<!-- <button type="submit">작성</button> -->
+		<c:forEach items="${reply}" var="reply">
+			<li>
+				<div>
+					<p>${reply.writer}/ <fmt:formatDate value="${reply.regDate}" pattern="yyyy-MM-dd" /></p>
+					<p>${reply.content }</p>
+				</div>
+			</li>
+		</c:forEach>
+	</ul>
 
-	</form>
+	<div>
+
+		<form method="post" action="/reply/write">
+
+			<p>
+				<label>댓글 작성자</label> <input type="text" name="writer">
+			</p>
+			<p>
+				<textarea rows="5" cols="50" name="content"></textarea>
+			</p>
+			<p>
+				<input type="hidden" name="bno" value="${view.bno}">
+				<button type="submit">댓글 작성</button>
+			</p>
+		</form>
+
+	</div>
+	<!-- 댓글종료 -->
+	
 </body>
 </html>
