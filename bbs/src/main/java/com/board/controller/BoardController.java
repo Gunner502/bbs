@@ -3,6 +3,7 @@ package com.board.controller;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.servlet.http.HttpSession;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,8 +38,13 @@ public class BoardController {
 	}
 	
 	@RequestMapping(value="write", method=RequestMethod.GET)
-	public void getWrite(Model model) throws Exception {
-	
+	public void getWrite(HttpSession session, Model model) throws Exception {
+		Object loginInfo = session.getAttribute("member");
+
+		if(loginInfo == null) {
+			System.out.println("loginError\n");
+			model.addAttribute("msg", "loginError");
+		}
 	}
 	
 	// 게시물 작성
